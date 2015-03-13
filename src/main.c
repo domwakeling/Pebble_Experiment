@@ -42,7 +42,7 @@ void digits_update_proc(Layer *l, GContext *ctx) {
 
 	// get integer value; convert from ascii to numeric
 	int val = (int)time_buffer[layer_ref] - 48;
-	APP_LOG(APP_LOG_LEVEL_INFO, "Layer ref %d, value %d", layer_ref, val);
+	//APP_LOG(APP_LOG_LEVEL_INFO, "Layer ref %d, value %d", layer_ref, val);
 	
 	// call drawdigit() to actually draw the characters
 	drawdigit(ctx, val);
@@ -98,6 +98,9 @@ void main_window_load() {
 	layer_add_child(window_layer, hours2_layer);
 	layer_add_child(window_layer, mins1_layer);
 	layer_add_child(window_layer, mins2_layer);
+	
+	// Ensure correct time
+	update_time();
 }
 
 void main_window_unload() {

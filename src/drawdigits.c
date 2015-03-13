@@ -113,9 +113,20 @@ const GPathInfo ZERO_LOWER_RIGHT = {
 	.points = (GPoint[]) {{28,48}, {30,48}, {30,62}, {28,62}}
 };
 
+const GPathInfo SEVEN_BAR_LEFT = {
+	.num_points = 4,
+	.points = (GPoint[]) {{0,0}, {14,0}, {14,1}, {0,1}}
+};
+
+const GPathInfo SEVEN_BAR_RIGHT = {
+	.num_points = 4,
+	.points = (GPoint[]) {{16,0}, {30,0}, {30,1}, {16,1}}
+};
+
 const GPathInfo SEVEN_TOP_RIGHT = {
 	.num_points = 4,
-	.points = (GPoint[]) {{30,14}, {30,17}, {28,17}, {28,14}}
+	.points = (GPoint[]) {{30,3}, {30,17}, {28,17}, {28,3}}
+	//.points = (GPoint[]) {{30,14}, {30,17}, {28,17}, {28,14}}
 };
 
 const GPathInfo SEVEN_SECOND_RIGHT_DIAGONAL = {
@@ -168,9 +179,19 @@ const GPathInfo FOUR_SECOND_LEFT_DIAGONAL = {
 	.points = (GPoint[]) {{0,24}, {2,24}, {12,34}, {12,38}, {0,25}}
 };
 
+const GPathInfo FOUR_UPPER_LEFT_VERTICAL = {
+	.num_points = 4,
+	.points = (GPoint[]) {{0,16}, {2,16}, {2,35}, {0,35}}
+};
+
+const GPathInfo FOUR_LEFT_BAR = {
+	.num_points = 4,
+	.points = (GPoint[]) {{0,37}, {12,37}, {12,38}, {0,37}}
+};
+
 const GPathInfo FOUR_RIGHT_BAR = {
 	.num_points = 4,
-	.points = (GPoint[]) {{18,37}, {30,37}, {30,39}, {18,39}}
+	.points = (GPoint[]) {{18,37}, {30,37}, {30,38}, {18,38}}
 };
 
 /* *** Functions to draw paths *** */
@@ -284,6 +305,15 @@ void draw_zero_lower_right(GContext *ctx) {
 	gpath_draw_filled(ctx, t_path);
 }
 
+void draw_seven_bar_left(GContext *ctx) {
+	GPath *t_path = gpath_create(&SEVEN_BAR_LEFT);
+	gpath_draw_filled(ctx, t_path);
+}
+
+void draw_seven_bar_right(GContext *ctx) {
+	GPath *t_path = gpath_create(&SEVEN_BAR_RIGHT);
+	gpath_draw_filled(ctx, t_path);
+}
 void draw_seven_top_right(GContext *ctx) {
 	GPath *t_path = gpath_create(&SEVEN_TOP_RIGHT);
 	gpath_draw_filled(ctx, t_path);
@@ -334,8 +364,18 @@ void draw_one_fifth(GContext *ctx) {
 	gpath_draw_filled(ctx, t_path);
 }
 
+void draw_four_upper_left_vertical(GContext *ctx) {
+	GPath *t_path = gpath_create(&FOUR_UPPER_LEFT_VERTICAL);
+	gpath_draw_filled(ctx, t_path);
+}
+
 void draw_four_second_left_diagonal(GContext *ctx) {
 	GPath *t_path = gpath_create(&FOUR_SECOND_LEFT_DIAGONAL);
+	gpath_draw_filled(ctx, t_path);
+}
+
+void draw_four_left_bar(GContext *ctx) {
+	GPath *t_path = gpath_create(&FOUR_LEFT_BAR);
 	gpath_draw_filled(ctx, t_path);
 }
 
@@ -395,8 +435,10 @@ void draw_three(GContext *ctx) {
 
 void draw_four(GContext *ctx) {
 	draw_eight_upper_left_diagonal(ctx);
-	draw_eight_upper_left_vertical(ctx);
-	draw_four_second_left_diagonal(ctx);
+	//draw_eight_upper_left_vertical(ctx);
+	//draw_four_second_left_diagonal(ctx);
+	draw_four_upper_left_vertical(ctx);
+	draw_four_left_bar(ctx);
 	draw_four_right_bar(ctx);
 	draw_one_third(ctx);
 	draw_one_fourth(ctx);
@@ -430,9 +472,11 @@ void draw_six(GContext *ctx) {
 }
 
 void draw_seven(GContext *ctx) {
-	draw_eight_upper_left_diagonal(ctx);
-	draw_eight_upper_right_diagonal(ctx);
-	draw_eight_upper_left_vertical(ctx);
+	//draw_eight_upper_left_diagonal(ctx);
+	//draw_eight_upper_right_diagonal(ctx);
+	//draw_eight_upper_left_vertical(ctx);
+	draw_seven_bar_left(ctx);
+	draw_seven_bar_right(ctx);
 	draw_seven_second_right_diagonal(ctx);
 	draw_seven_upper_middle(ctx);
 	draw_seven_middle_middle(ctx);
