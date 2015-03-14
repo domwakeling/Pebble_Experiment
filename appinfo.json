@@ -3,7 +3,7 @@
     "capabilities": [
         ""
     ],
-    "companyName": "dominic.wakeling@btinternet.co",
+    "companyName": "Dominic Wakeling",
     "longName": "Segmented",
     "projectType": "native",
     "resources": {
@@ -13,7 +13,7 @@
     "shortName": "Segmented",
     "uuid": "23754672-b5ed-4198-b99a-a868ec8acca1",
     "versionCode": 1,
-    "versionLabel": "1.0",
+    "versionLabel": "1.2",
     "watchapp": {
         "watchface": true
     }

@@ -14,7 +14,11 @@ void custom_draw_gpathinfo(GContext *ctx, GPathInfo *pathinfo) {
 void draw_left_1(GContext *ctx) {
 	GPathInfo TEMP = {
 		.num_points = 4,
-		.points = (GPoint[]) {{0,0}, {4,0}, {4,3}, {0,7}}
+		//.points = (GPoint[]) {{0,0}, {4,0}, {4,3}, {0,7}}
+		// amended to 'cover' segs 1&2
+		//.points = (GPoint[]) {{0,0}, {4,0}, {4,15}, {0,11}}
+		// shave 2px off top
+		.points = (GPoint[]) {{0,2}, {4,2}, {4,15}, {0,11}}
 	};
 	custom_draw_gpathinfo(ctx, &TEMP);
 }
@@ -78,7 +82,11 @@ void draw_left_8(GContext *ctx) {
 void draw_left_9(GContext *ctx) {
 	GPathInfo TEMP = {
 		.num_points = 4,
-		.points = (GPoint[]) {{0,78}, {4,82}, {4,85}, {0,85}}
+		//.points = (GPoint[]) {{0,78}, {4,82}, {4,85}, {0,85}}
+		// increased to cover segs 8&9
+		//.points = (GPoint[]) {{0,74}, {4,70}, {4,85}, {0,85}}
+		// shave 2 px off bottom
+		.points = (GPoint[]) {{0,74}, {4,70}, {4,83}, {0,83}}
 	};
 	custom_draw_gpathinfo(ctx, &TEMP);
 }
@@ -86,7 +94,11 @@ void draw_left_9(GContext *ctx) {
 void draw_right_1(GContext *ctx) {
 	GPathInfo TEMP = {
 		.num_points = 4,
-		.points = (GPoint[]) {{30,0}, {26,0}, {26,3}, {30,7}}
+		//.points = (GPoint[]) {{30,0}, {26,0}, {26,3}, {30,7}}
+		// increased to 'cover' segs 1&2
+		//.points = (GPoint[]) {{30,0}, {26,0}, {26,15}, {30,11}}
+		// shave 2px off top
+		.points = (GPoint[]) {{30,2}, {26,2}, {26,15}, {30,11}}
 	};
 	custom_draw_gpathinfo(ctx, &TEMP);
 }
@@ -150,7 +162,11 @@ void draw_right_8(GContext *ctx) {
 void draw_right_9(GContext *ctx) {
 	GPathInfo TEMP = {
 		.num_points = 4,
-		.points = (GPoint[]) {{30,78}, {26,82}, {26,85}, {30,85}}
+		//.points = (GPoint[]) {{30,78}, {26,82}, {26,85}, {30,85}}
+		// increased to cover segs 8&9
+		//.points = (GPoint[]) {{30,74}, {26,70}, {26,85}, {30,85}}
+		// shave bottom by 2px
+		.points = (GPoint[]) {{30,74}, {26,70}, {26,83}, {30,83}}
 	};
 	custom_draw_gpathinfo(ctx, &TEMP);
 }
@@ -227,6 +243,39 @@ void draw_rhombus(GContext *ctx) {
 	custom_draw_gpathinfo(ctx, &TEMP);	
 }
 
+void draw_center_1(GContext *ctx) {
+	GPathInfo TEMP = {
+		.num_points = 4,
+		.points = (GPoint[]) {{13,2}, {17,2}, {17,21}, {13,17}}
+	};
+	custom_draw_gpathinfo(ctx, &TEMP);
+}
+
+void draw_center_2(GContext *ctx) {
+	GPathInfo TEMP = {
+		.num_points = 4,
+		.points = (GPoint[]) {{13,20}, {17,24}, {17,39}, {13,43}}
+	};
+	custom_draw_gpathinfo(ctx, &TEMP);
+}
+
+void draw_center_3(GContext *ctx) {
+	GPathInfo TEMP = {
+		.num_points = 4,
+		.points = (GPoint[]) {{13,61}, {17,65}, {17,42}, {13,46}}
+	};
+	custom_draw_gpathinfo(ctx, &TEMP);
+}
+
+void draw_center_4(GContext *ctx) {
+	GPathInfo TEMP = {
+		.num_points = 4,
+		.points = (GPoint[]) {{13,83}, {17,83}, {17,68}, {13,64}}
+	};
+	custom_draw_gpathinfo(ctx, &TEMP);
+}
+
+
 /* *** Functions to draw numbers from paths *** */
 
 void draw_zero(GContext *ctx) {
@@ -247,15 +296,19 @@ void draw_zero(GContext *ctx) {
 }
 
 void draw_one(GContext *ctx) {
-	draw_right_1(ctx);
-	draw_right_2(ctx);
-	draw_right_3(ctx);
-	draw_right_4(ctx);
-	draw_right_5(ctx);
-	draw_right_6(ctx);
-	draw_right_7(ctx);
-	draw_right_8(ctx);
-	draw_right_9(ctx);
+	draw_center_1(ctx);
+	draw_center_2(ctx);
+	draw_center_3(ctx);
+	draw_center_4(ctx);
+	//draw_right_1(ctx);
+	//draw_right_2(ctx);
+	//draw_right_3(ctx);
+	//draw_right_4(ctx);
+	//draw_right_5(ctx);
+	//draw_right_6(ctx);
+	//draw_right_7(ctx);
+	//draw_right_8(ctx);
+	//draw_right_9(ctx);
 }
 															 
 void draw_two(GContext *ctx) {
