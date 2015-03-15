@@ -78,10 +78,10 @@ void main_window_load() {
 	// Create the layers
 	background_layer = layer_create(GRect(0, 0, 144, 168));
 	dots_layer = layer_create(GRect(71, 43, 2, 80));
-	hours1_layer = layer_create(GRect(2, 40, 31, 86));
-	hours2_layer = layer_create(GRect(36, 40, 31, 86));
-	mins1_layer = layer_create(GRect(76, 40, 31, 86));
-	mins2_layer = layer_create(GRect(111, 40, 31, 86));
+	hours1_layer = layer_create(GRect(2, 39, 31, 88));
+	hours2_layer = layer_create(GRect(36, 39, 31, 88));
+	mins1_layer = layer_create(GRect(76, 39, 31, 88));
+	mins2_layer = layer_create(GRect(111, 39, 31, 88));
 	
 	// Set update_proc
 	layer_set_update_proc(hours1_layer, digits_update_proc);
