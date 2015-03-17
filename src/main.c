@@ -1,10 +1,15 @@
 #include <pebble.h>
 #include "drawdigits.h"
+#include "drawdate.h"
 
+const int DATE_LENGTH = 7;
+	
 static Window *main_window;
 static Layer *background_layer, *dots_layer;
 static Layer *hours1_layer, *hours2_layer, *mins1_layer, *mins2_layer;
+static Layer *date_layer;
 static char time_buffer[] = "1234";
+static char date_buffer[] = "30 SEP";
 
 void background_update_proc(Layer *l, GContext *ctx) {
 	// make background black
@@ -48,6 +53,15 @@ void digits_update_proc(Layer *l, GContext *ctx) {
 	drawdigit(ctx, val);
 }
 
+void date_update_proc(Layer *l, GContext *ctx) {
+	// set context fill and stroke
+	graphics_context_set_fill_color(ctx, GColorWhite);
+	graphics_context_set_stroke_color(ctx, GColorWhite);
+	
+	// call drawdate() sending the date_buffer string
+	drawdate(ctx, date_buffer);
+}
+
 void update_time() {
 	// Get a tm struct
 	time_t temp = time(NULL);
@@ -60,11 +74,24 @@ void update_time() {
 		strftime(time_buffer, sizeof(time_buffer), "%I%M", tick_time);
 	}
 	
+	// get the date into the date_buffer
+	
+	strftime(date_buffer, DATE_LENGTH, "%d %b", tick_time);
+	
+	// convert to upper case
+	u_int i = 0;
+	for (i = 0; i < strlen(date_buffer) ; i++) {
+		if( (date_buffer[i] >= 97) && (date_buffer[i] <= 122) ) {
+			date_buffer[i] = date_buffer[i] - 32;
+		} 
+	}
+	
 	// mark the graphics layers dirty
 	layer_mark_dirty(hours1_layer);
 	layer_mark_dirty(hours2_layer);
 	layer_mark_dirty(mins1_layer);
 	layer_mark_dirty(mins2_layer);
+	layer_mark_dirty(date_layer);
 }
 
 void tick_handler(struct tm * time_time, TimeUnits units_changed) {
@@ -77,20 +104,22 @@ void main_window_load() {
 	
 	// Create the layers
 	background_layer = layer_create(GRect(0, 0, 144, 168));
-	dots_layer = layer_create(GRect(71, 43, 2, 80));
-	hours1_layer = layer_create(GRect(2, 39, 31, 88));
-	hours2_layer = layer_create(GRect(36, 39, 31, 88));
-	mins1_layer = layer_create(GRect(76, 39, 31, 88));
-	mins2_layer = layer_create(GRect(111, 39, 31, 88));
+	dots_layer = layer_create(GRect(71, 38, 2, 80));
+	hours1_layer = layer_create(GRect(2, 34, 31, 88));
+	hours2_layer = layer_create(GRect(36, 34, 31, 88));
+	mins1_layer = layer_create(GRect(76, 34, 31, 88));
+	mins2_layer = layer_create(GRect(111, 34, 31, 88));
+	date_layer = layer_create(GRect(40,143,64,21));
 	
-	// Set update_proc
+	// Set update_proc for graphics layers
 	layer_set_update_proc(hours1_layer, digits_update_proc);
 	layer_set_update_proc(hours2_layer, digits_update_proc);
 	layer_set_update_proc(mins1_layer, digits_update_proc);
 	layer_set_update_proc(mins2_layer, digits_update_proc);
 	layer_set_update_proc(background_layer, background_update_proc);
 	layer_set_update_proc(dots_layer, dots_update_proc);
-	
+	layer_set_update_proc(date_layer, date_update_proc);
+		
 	// Add all layers to the window
 	layer_add_child(window_layer, background_layer);
 	layer_add_child(window_layer, dots_layer);
@@ -98,6 +127,7 @@ void main_window_load() {
 	layer_add_child(window_layer, hours2_layer);
 	layer_add_child(window_layer, mins1_layer);
 	layer_add_child(window_layer, mins2_layer);
+	layer_add_child(window_layer, date_layer);
 	
 	// Ensure correct time
 	update_time();
@@ -111,6 +141,7 @@ void main_window_unload() {
 	layer_destroy(mins2_layer);
 	layer_destroy(background_layer);
 	layer_destroy(dots_layer);
+	layer_destroy(date_layer);
 }
 
 void init() {
