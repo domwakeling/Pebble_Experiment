@@ -250,6 +250,23 @@ void draw_date_G(GContext *ctx, int i) {
 	draw_horiz_line(ctx, i, 10, 5, 6);
 }
 
+void draw_date_H(GContext *ctx, int i) {
+	draw_left_line(ctx, i, 0, 11);
+	draw_left_line(ctx, i, 16, 20);
+	draw_third_left_diagonal(ctx, i);
+	draw_third_right_diagonal(ctx, i);
+	draw_right_line(ctx, i, 0, 11);
+	draw_right_line(ctx, i, 16, 20);
+}
+
+void draw_date_I(GContext *ctx, int i) {
+	draw_horiz_line(ctx, i, 0, 0, 3);
+	draw_horiz_line(ctx, i, 0, 5, 8);
+	draw_horiz_line(ctx, i, 20, 0, 3);
+	draw_horiz_line(ctx, i, 20, 5, 8);
+	draw_mid_line(ctx, i, 2, 10);
+	draw_mid_line(ctx, i, 12, 18);
+}
 
 void draw_date_J(GContext *ctx, int i) {
 	draw_bottom_left_diagonal(ctx, i);
@@ -257,7 +274,16 @@ void draw_date_J(GContext *ctx, int i) {
 	draw_right_line(ctx, i, 0, 7);
 	draw_right_line(ctx, i, 9, 15);
 	draw_horiz_line(ctx, i, 0, 1, 6);
-	
+}
+
+void draw_date_K(GContext *ctx, int i) {
+	draw_left_line(ctx, i, 0, 9);
+	draw_left_line(ctx, i, 11, 20);
+	draw_horiz_line(ctx, i, 10, 2, 3);
+	draw_second_right_diagonal(ctx, i);
+	draw_third_right_diagonal(ctx, i);
+	draw_right_line(ctx, i, 0, 4);
+	draw_right_line(ctx, i, 16, 20);
 }
 
 void draw_date_L(GContext *ctx, int i) {
@@ -273,7 +299,6 @@ void draw_date_M(GContext *ctx, int i) {
 	draw_right_line(ctx, i, 11, 20);
 	graphics_draw_line(ctx, GPoint(2 + calc_offset(i), 2), GPoint(4 + calc_offset(i), 8));
 	graphics_draw_line(ctx, GPoint(4 + calc_offset(i), 8), GPoint(6 + calc_offset(i), 2));
-	
 }
 
 void draw_date_N(GContext *ctx, int i) {
@@ -291,6 +316,17 @@ void draw_date_P(GContext *ctx, int i) {
 	draw_left_line(ctx, i, 11, 20);
 	draw_horiz_line(ctx, i, 0, 2, 3);
 	draw_horiz_line(ctx, i, 10, 2, 3);
+}
+
+void draw_date_Q(GContext *ctx, int i) {
+	draw_top_left_diagonal(ctx, i);
+	draw_top_right_diagonal(ctx, i);
+	draw_bottom_left_diagonal(ctx, i);
+	draw_bottom_right_diagonal(ctx, i);
+	draw_third_right_diagonal(ctx, i);
+	draw_left_line(ctx, i, 5, 9);
+	draw_left_line(ctx, i, 11, 15);
+	draw_right_line(ctx, i, 5, 11);
 }
 
 void draw_date_R(GContext *ctx, int i) {
@@ -338,12 +374,41 @@ void draw_date_V(GContext *ctx, int i) {
 	graphics_draw_line(ctx, GPoint(4 + calc_offset(i), 20), GPoint(8+calc_offset(i), 14));
 }
 
+void draw_date_W(GContext *ctx, int i) {
+	draw_left_line(ctx, i, 0, 9);
+	draw_left_line(ctx, i, 11, 20);
+	draw_right_line(ctx, i, 0, 9);
+	draw_right_line(ctx, i, 11, 20);
+	graphics_draw_line(ctx, GPoint(2 + calc_offset(i), 18), GPoint(4 + calc_offset(i), 12));
+	graphics_draw_line(ctx, GPoint(4 + calc_offset(i), 12), GPoint(6 + calc_offset(i), 18));
+}
+
+void draw_date_X(GContext *ctx, int i) {
+	draw_second_left_diagonal(ctx, i);
+	draw_second_right_diagonal(ctx, i);
+	draw_third_left_diagonal(ctx, i);
+	draw_third_right_diagonal(ctx, i);
+	draw_left_line(ctx, i, 0, 4);
+	draw_right_line(ctx, i, 0, 4);
+	draw_left_line(ctx, i, 16, 20);
+	draw_right_line(ctx, i, 16, 20);
+}
+
 void draw_date_Y(GContext *ctx, int i) {
 	draw_left_line(ctx, i, 0, 4);
 	draw_right_line(ctx, i, 0, 4);
 	draw_second_left_diagonal(ctx, i);
 	draw_second_right_diagonal(ctx, i);
 	draw_mid_line(ctx, i, 12, 20);
+}
+
+void draw_date_Z(GContext *ctx, int i) {
+	draw_second_right_diagonal(ctx, i);
+	draw_third_left_diagonal(ctx, i);
+	draw_horiz_line(ctx, i, 20, 2, 8);
+	draw_horiz_line(ctx, i, 0, 0, 6);
+	draw_right_line(ctx, i, 0, 4);
+	draw_left_line(ctx, i, 16, 20);
 }
 
 /* main switching call, public */
@@ -407,8 +472,17 @@ void drawdate(GContext *ctx, char *date_buffer) {
 				case 71:
 					draw_date_G(ctx, i);
 					break;
+				case 72:
+					draw_date_H(ctx, i);
+					break;
+				case 73:
+					draw_date_I(ctx, i);
+					break;
 				case 74:
 					draw_date_J(ctx, i);
+					break;
+				case 75:
+					draw_date_K(ctx, i);
 					break;
 				case 76:
 					draw_date_L(ctx, i);
@@ -425,7 +499,9 @@ void drawdate(GContext *ctx, char *date_buffer) {
 				case 80:
 					draw_date_P(ctx, i);
 					break;
-				
+				case 81:
+					draw_date_Q(ctx, i);
+					break;
 				case 82:
 					draw_date_R(ctx, i);
 					break;
@@ -441,8 +517,17 @@ void drawdate(GContext *ctx, char *date_buffer) {
 				case 86:
 					draw_date_V(ctx, i);
 					break;
+				case 87:
+					draw_date_W(ctx, i);
+					break;
+				case 88:
+					draw_date_X(ctx, i);
+					break;
 				case 89:
 					draw_date_Y(ctx, i);
+					break;
+				case 90:
+					draw_date_Z(ctx, i);
 					break;
 				default:
 					drawframe(ctx, i);
