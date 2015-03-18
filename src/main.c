@@ -104,11 +104,11 @@ void main_window_load() {
 	
 	// Create the layers
 	background_layer = layer_create(GRect(0, 0, 144, 168));
-	dots_layer = layer_create(GRect(71, 38, 2, 80));
-	hours1_layer = layer_create(GRect(2, 34, 31, 88));
-	hours2_layer = layer_create(GRect(36, 34, 31, 88));
-	mins1_layer = layer_create(GRect(76, 34, 31, 88));
-	mins2_layer = layer_create(GRect(111, 34, 31, 88));
+	dots_layer = layer_create(GRect(71, 43, 2, 80));
+	hours1_layer = layer_create(GRect(2, 39, 31, 88));
+	hours2_layer = layer_create(GRect(36, 39, 31, 88));
+	mins1_layer = layer_create(GRect(76, 39, 31, 88));
+	mins2_layer = layer_create(GRect(111, 39, 31, 88));
 	date_layer = layer_create(GRect(40,143,64,21));
 	
 	// Set update_proc for graphics layers
