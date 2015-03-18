@@ -1,7 +1,9 @@
 {
-    "appKeys": {},
+    "appKeys": {
+        "KEY_SHOW_DATE": 0
+    },
     "capabilities": [
-        ""
+        "configurable"
     ],
     "companyName": "Dominic Wakeling",
     "longName": "Segmented",
