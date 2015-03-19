@@ -1,7 +1,9 @@
 {
-    "appKeys": {},
+    "appKeys": {
+        "KEY_SHOW_DATE": 0
+    },
     "capabilities": [
-        ""
+        "configurable"
     ],
     "companyName": "Dominic Wakeling",
     "longName": "Segmented",
@@ -13,7 +15,7 @@
     "shortName": "Segmented",
     "uuid": "23754672-b5ed-4198-b99a-a868ec8acca1",
     "versionCode": 1,
-    "versionLabel": "1.3",
+    "versionLabel": "1.4",
     "watchapp": {
         "watchface": true
     }
