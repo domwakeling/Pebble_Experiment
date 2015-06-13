@@ -9,13 +9,20 @@
     "longName": "Segmented",
     "projectType": "native",
     "resources": {
-        "media": []
+        "media": [
+            {
+                "file": "images/Segmented_2318_28SQ.png",
+                "menuIcon": true,
+                "name": "MENU_IMAGE_28SQ",
+                "type": "png"
+            }
+        ]
     },
     "sdkVersion": "2",
     "shortName": "Segmented",
     "uuid": "23754672-b5ed-4198-b99a-a868ec8acca1",
     "versionCode": 1,
-    "versionLabel": "1.4",
+    "versionLabel": "1.5",
     "watchapp": {
         "watchface": true
     }
