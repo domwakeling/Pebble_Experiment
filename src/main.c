@@ -320,11 +320,10 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 					// store bluetooth visible true
 					APP_LOG(APP_LOG_LEVEL_INFO, "Received bluetooth 'on', writing to storage");
 					persist_write_bool(STORAGE_BLUETOOTH_VISIBLE, true);
-					// unsubscribe (to be safe), subscribe to the service, get current status
-					//bluetooth_connection_service_unsubscribe();
+					// subscribe to the service, get current status
 					bluetooth_connection_service_subscribe(bt_handler);
 					APP_LOG(APP_LOG_LEVEL_INFO, "Subscribed to blueooth connection");
-					//bluetooth_connected = bluetooth_connection_service_peek();
+					bluetooth_connected = bluetooth_connection_service_peek();
 					// update the display
 					update_time();
 				} else if (strcmp(bluetooth_on_off_buffer, "off") == 0){
