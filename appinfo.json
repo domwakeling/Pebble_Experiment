@@ -1,5 +1,7 @@
 {
     "appKeys": {
+        "KEY_DIGIT_COLOUR": 2,
+        "KEY_SHOW_BLUETOOTH": 1,
         "KEY_SHOW_DATE": 0
     },
     "capabilities": [
@@ -18,11 +20,14 @@
             }
         ]
     },
-    "sdkVersion": "2",
+    "sdkVersion": "3",
     "shortName": "Segmented",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
     "uuid": "23754672-b5ed-4198-b99a-a868ec8acca1",
-    "versionCode": 1,
-    "versionLabel": "1.5",
+    "versionLabel": "1.6",
     "watchapp": {
         "watchface": true
     }

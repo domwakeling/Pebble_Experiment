@@ -1,15 +1,23 @@
 #include <pebble.h>
 #include "drawdate.h"
 
-/* constants used for frame size to avoid magic numbers */
 
+/*****************************************************/
+/***************** DEFINE CONSTANTS ******************/	
+/*****************************************************/
+
+/* constants used for frame size to avoid magic numbers */
 const int FRAME_WIDTH = 9;
 const int FRAME_HEIGHT = 21;
 const int FRAME_SPACE = 3;
 const int FRAME_3_NARROW = 7;
 
-/* return offset for each character */
 
+/*****************************************************/
+/***************** HELPER FUNCTIONS ******************/	
+/*****************************************************/
+
+/* return horizontal offset for each character in the date */
 int calc_offset(int i) {
 	int offset = i * (FRAME_WIDTH + FRAME_SPACE);
 	if (i > 2) {
@@ -18,24 +26,10 @@ int calc_offset(int i) {
 	return offset;
 }
 
-/* custom path drawing app; this differs from that in drawdigits.c because it allows for horizontal offset */
 
-void custom_draw_gpathinfo_with_offset(GContext *ctx, GPathInfo *pathinfo, int i) {
-	GPath *t_path = gpath_create(pathinfo);
-	gpath_move_to(t_path, GPoint( calc_offset(i), 0 ));
-	gpath_draw_filled(ctx, t_path);
-	gpath_destroy(t_path);
-}
-
-/* "dummy" drawframe() function; this will draw a white frame and is used as the default in drawdate() */
-
-void drawframe(GContext *ctx, int i) {
-	GPathInfo TEMP_PATH =  {
-		.num_points = 4,
-		.points = (GPoint[]) {{0,0}, {FRAME_WIDTH - 1, 0}, {FRAME_WIDTH - 1, FRAME_HEIGHT - 1}, {0, FRAME_HEIGHT - 1}}
-	};
-	custom_draw_gpathinfo_with_offset( ctx, &TEMP_PATH, i);
-}
+/*****************************************************/
+/************ DRAWNG INDIVIDUAL ELEMENTS *************/	
+/*****************************************************/
 
 /* individual drawing elements, called by specific digit routines, to maximise code reuse */
 
@@ -71,8 +65,6 @@ void draw_bottom_right_diagonal(GContext *ctx, int i) {
 	graphics_draw_line(ctx, GPoint(5 + calc_offset(i), 20), GPoint(8 + calc_offset(i), 17));
 }
 
-/* helper functions for drawing vertical lines */
-
 void draw_left_line(GContext *ctx, int i, int top_pixel, int bottom_pixel) {
 	graphics_draw_line(ctx, GPoint(0 + calc_offset(i), top_pixel), GPoint(0 + calc_offset(i), bottom_pixel));
 }
@@ -88,6 +80,11 @@ void draw_right_line(GContext *ctx, int i, int top_pixel, int bottom_pixel) {
 void draw_horiz_line(GContext *ctx, int i, int height, int left_pixel, int right_pixel) {
 	graphics_draw_line(ctx, GPoint(left_pixel + calc_offset(i), height), GPoint(right_pixel + calc_offset(i), height));
 }
+
+
+/*****************************************************/
+/************* DRAWNG NUMBERS & LETTERS **************/	
+/*****************************************************/
 
 /* individual digit drawing functions */
 
@@ -346,8 +343,12 @@ void draw_date_Y(GContext *ctx, int i) {
 	draw_mid_line(ctx, i, 12, 20);
 }
 
-/* main switching call, public */
 
+/*****************************************************/
+/******************** MAIN CALL **********************/	
+/*****************************************************/
+
+/* main switching call, public */
 void drawdate(GContext *ctx, char *date_buffer) {
 	
 	for( int i = 0; i < 6; i++) {
@@ -355,7 +356,6 @@ void drawdate(GContext *ctx, char *date_buffer) {
 		if ( i != 2) {  					// 3rd character is a blank space
 			
 			switch(date_buffer[i]) {
-				
 				case 48:
 					draw_date_0(ctx,i);
 					break;
@@ -445,9 +445,8 @@ void drawdate(GContext *ctx, char *date_buffer) {
 					draw_date_Y(ctx, i);
 					break;
 				default:
-					drawframe(ctx, i);
+					draw_date_8(ctx, i);		// should never reach here, but if you do draw a figure 8
 					break;
-				
 			}
 			
 		}

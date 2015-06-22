@@ -1,4 +1,5 @@
 #pragma once
+#include <pebble.h>
 
 void drawdigit(GContext *ctx, int val);
 
