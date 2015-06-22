@@ -137,7 +137,6 @@ void bluetooth_update_proc(Layer *l, GContext *ctx) {
 	
 	// check whether we are configured to draw bluetooth
 	bool drawing_bluetooth = persist_read_bool(STORAGE_BLUETOOTH_VISIBLE);
-	drawing_bluetooth = true;
 	
 	if (drawing_bluetooth && bluetooth_connected) {
 		graphics_draw_line(ctx, GPoint(BT_WIDTH, 0), GPoint(2 * BT_WIDTH, BT_HEIGHT));
