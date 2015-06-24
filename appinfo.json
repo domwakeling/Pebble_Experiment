@@ -15,7 +15,7 @@
             {
                 "file": "images/Segmented_2318_28SQ.png",
                 "menuIcon": true,
-                "name": "MENU_IMAGE_28SQ",
+                "name": "MENU_IMAGE_28_SQ",
                 "type": "png"
             }
         ]
@@ -27,7 +27,7 @@
         "basalt"
     ],
     "uuid": "23754672-b5ed-4198-b99a-a868ec8acca1",
-    "versionLabel": "1.7",
+    "versionLabel": "1.8",
     "watchapp": {
         "watchface": true
     }
