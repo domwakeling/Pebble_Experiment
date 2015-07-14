@@ -17,10 +17,10 @@ Pebble.addEventListener("showConfiguration", function() {
 	
 	if(watch_type >= 3) {
 		console.log("showing configuration for basalt");
-		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_1_6_col.html?'+encodeURIComponent(JSON.stringify(options)));
+		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_1_9_col.html?'+encodeURIComponent(JSON.stringify(options)));
 	} else {
 		console.log("showing configuration for aplite");
-		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_1_6_bw.html?'+encodeURIComponent(JSON.stringify(options)));
+		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_1_9_bw.html?'+encodeURIComponent(JSON.stringify(options)));
 	}
 });
 
@@ -39,13 +39,23 @@ Pebble.addEventListener("webviewclosed", function(e) {
 		console.log("Options = " + JSON.stringify(options));
 		
 		// we want to make a dictionary from the available information, so get the values as variables ...
-		var dateshowing = options.datevisible;
+		var dateshowing;
+		if( options.datevisible == "checked") {
+			dateshowing = "on";
+		} else {
+			dateshowing = "off";
+		}
 		console.log("dateshowing: " + dateshowing);
 		
 		var selectedcolour = options.basalt_colors;
 		console.log("colour selected: " + selectedcolour);
 		
-		var bluetoothshowing = options.showbluetooth;
+		var bluetoothshowing;
+		if( options.showbluetooth == "checked") {
+			bluetoothshowing = "on";
+		} else {
+			bluetoothshowing = "off";
+		}
 		console.log("bluetoothshowing: " + bluetoothshowing);
 		
 		// ... then build a dictionary ...
