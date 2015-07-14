@@ -47,7 +47,7 @@ Pebble.addEventListener("webviewclosed", function(e) {
 		}
 		console.log("dateshowing: " + dateshowing);
 		
-		var selectedcolour = options.basalt_colors;
+		var selectedcolour = options.digit_colour.toString().slice(2);
 		console.log("colour selected: " + selectedcolour);
 		
 		var bluetoothshowing;
