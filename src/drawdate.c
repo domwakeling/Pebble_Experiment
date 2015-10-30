@@ -1,23 +1,17 @@
 #include <pebble.h>
 #include "drawdate.h"
 
+/*** DEFINE CONSTANTS ***/	
 
-/*****************************************************/
-/***************** DEFINE CONSTANTS ******************/	
-/*****************************************************/
-
-/* constants used for frame size to avoid magic numbers */
+// constants used for frame size to avoid magic numbers
 const int FRAME_WIDTH = 9;
 const int FRAME_HEIGHT = 21;
 const int FRAME_SPACE = 3;
 const int FRAME_3_NARROW = 7;
 
+/*** HELPER FUNCTIONS ***/	
 
-/*****************************************************/
-/***************** HELPER FUNCTIONS ******************/	
-/*****************************************************/
-
-/* return horizontal offset for each character in the date */
+// return horizontal offset for each character in the date
 int calc_offset(int i) {
 	int offset = i * (FRAME_WIDTH + FRAME_SPACE);
 	if (i > 2) {
@@ -26,12 +20,9 @@ int calc_offset(int i) {
 	return offset;
 }
 
+/*** DRAWNG INDIVIDUAL ELEMENTS ***/	
 
-/*****************************************************/
-/************ DRAWNG INDIVIDUAL ELEMENTS *************/	
-/*****************************************************/
-
-/* individual drawing elements, called by specific digit routines, to maximise code reuse */
+// individual drawing elements, called by specific digit routines, to maximise code reuse
 
 void draw_top_left_diagonal(GContext *ctx, int i) {
 	graphics_draw_line(ctx, GPoint(0 + calc_offset(i), 3), GPoint( 3 + calc_offset(i), 0));
@@ -81,12 +72,9 @@ void draw_horiz_line(GContext *ctx, int i, int height, int left_pixel, int right
 	graphics_draw_line(ctx, GPoint(left_pixel + calc_offset(i), height), GPoint(right_pixel + calc_offset(i), height));
 }
 
+/*** DRAWNG NUMBERS & LETTERS ***/	
 
-/*****************************************************/
-/************* DRAWNG NUMBERS & LETTERS **************/	
-/*****************************************************/
-
-/* individual digit drawing functions */
+// individual digit drawing functions
 
 void draw_date_0(GContext *ctx, int i) {
 	draw_top_left_diagonal(ctx, i);
@@ -247,7 +235,6 @@ void draw_date_G(GContext *ctx, int i) {
 	draw_horiz_line(ctx, i, 10, 5, 6);
 }
 
-
 void draw_date_J(GContext *ctx, int i) {
 	draw_bottom_left_diagonal(ctx, i);
 	draw_bottom_right_diagonal(ctx, i);
@@ -343,12 +330,9 @@ void draw_date_Y(GContext *ctx, int i) {
 	draw_mid_line(ctx, i, 12, 20);
 }
 
+/*** MAIN CALL ***/	
 
-/*****************************************************/
-/******************** MAIN CALL **********************/	
-/*****************************************************/
-
-/* main switching call, public */
+// main switching call, public
 void drawdate(GContext *ctx, char *date_buffer) {
 	
 	for( int i = 0; i < 6; i++) {

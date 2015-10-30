@@ -3,51 +3,74 @@
 #include "drawdate.h"
 #include "colourconversion.h"
 
-/*****************************************************/
-/***************** DEFINE KEY VALUES *****************/	
-/*****************************************************/
+/*** DEBUG MODE SWITCH ***/
+//#define DEBUG
 
-/* key values for communication with settings screen via Javascript */
-#define KEY_SHOW_DATE 0
+/*** KEY VALUES THROUGH DEFINES ***/	
+
+#define KEY_SHOW_DATE 0															// key values for communication with settings screen via Javascript
 #define KEY_SHOW_BLUETOOTH 1
 #define KEY_DIGIT_COLOUR 2
 
-/* key values for persistant storage */
-const uint32_t STORAGE_DATE_VISIBLE = 1;
+/*** KEY VALUES THROUGH DECLARATIONS ***/
+
+const uint32_t STORAGE_DATE_VISIBLE = 1;						// key values for persistant storage
 const uint32_t STORAGE_BLUETOOTH_VISIBLE = 2;
 const uint32_t STORAGE_DIGIT_COLOUR_RED = 3;
 const uint32_t STORAGE_DIGIT_COLOUR_BLUE = 4;
 const uint32_t STORAGE_DIGIT_COLOUR_GREEN = 5;
 
-/*****************************************************/
-/************* DEFINE CONSTANTS & COLORS *************/	
-/*****************************************************/
+/*** CONSTANTS THROUGH DEFINES - SIZE OF APP_MESSAGE ***/	
+#define APP_OUTBOX 64
+#define APP_INBOX 64
 
-/* height and width of bluetooth triangles */
-#define BT_HEIGHT 4
-#define BT_WIDTH 5
+/*** CONSTANTS THROUGH DEFINES - DIGITS ETC ***/	
 
-/* maximum length of date string, including return character */
-const int DATE_LENGTH = 7;
+#define DIGIT_W 31																	// width of each digit
+#define DIGIT_H 88																	// height of each digit
+#define DIGIT_M 3																		// margin between each digit
+#define DOTS_W 2																		// width of dots
+#define DOTS_H 5																		// height of individual dots
+#define DOTS_M 1																		// addl margin for dots
+#define DOTS_V 16																		// vertical gap between dots
 
-/* define "objects" */
+/*** CONSTANTS THROUGH DEFINES - BLUETOOTH LOGO ***/	
+
+#define BT_HEIGHT 4																	// height of bluetooth triangles
+#define BT_WIDTH 4																	// height of bluetooth triangles
+#define BLUE_V_OFF_RD 5															// offset of bluetooth from top
+#define BLUE_V_OFF_SQ 2
+#define BLUE_H_OFF 4																// offset of bluetooth from edge, square
+
+/*** CONSTANTS THROUGH DEFINES - DATE ***/	
+
+#define DATE_W 64
+#define DATE_H 21
+#define DATE_V_OFF_RD 10
+#define DATE_V_OFF_SQ 5
+
+/*** CONSTANTS THROUGH DECLARATIONS ***/
+
+const int DATE_LENGTH = 7;													// maximum length of date string, including return character
+
+/*** VARIABLES & OBJECTS THROUGH DECLARATIONS ***/
+
+bool bluetooth_connected = false;
+static char time_buffer[] = "1234";
+static char date_buffer[] = "30 SEP";
+
 static Window *main_window;
 static Layer *background_layer, *dots_layer;
 static Layer *hours1_layer, *hours2_layer, *mins1_layer, *mins2_layer;
 static Layer *date_layer;
 static Layer *bluetooth_layer;
 
-/* define char[]s to hold time and date */
-static char time_buffer[] = "1234";
-static char date_buffer[] = "30 SEP";
+/*** HELPER FUNCTIONS ***/
 
-/* bool to hold whether bluetooth is connected or not */
-bool bluetooth_connected = false;
-
-/* function to return colour */
+// read persistent digit colours and provide as a GColor
 GColor digit_colour() {
-	// if we're using a colour pebble
-	#ifdef PBL_COLOR
+	
+	#ifdef PBL_COLOR																	// if we're using a colour pebble
 		
 		// read the current persistant RGB (which will be 0,1,2,3) and convert to 0-255
 		int redval = persist_read_to_255(persist_read_int(STORAGE_DIGIT_COLOUR_RED));
@@ -58,33 +81,39 @@ GColor digit_colour() {
 		GColor tempColour = GColorFromRGB(redval, greenval, blueval);
 		return tempColour;
 	
+	#else
+		return GColorWhite;														// return white if we're using a B&W pebble
 	#endif
-		
-	// return white if we're using a B&W pebble
-	return GColorWhite;
+}													
+
+int digit_origin_y() {
+	GRect bounds = layer_get_frame(window_get_root_layer(main_window));
+	return (bounds.size.h - DIGIT_H) / 2;
 }
 
-
-/*****************************************************/
-/******************** UPDATE PROCS *******************/	
-/*****************************************************/
-
-/* update procedure for background - black rectangle */
-void background_update_proc(Layer *l, GContext *ctx) {
-	// make background black
-	graphics_context_set_fill_color(ctx, GColorBlack);
-	graphics_fill_rect(ctx, GRect(0, 0, 144, 168), 0, GCornerNone);
+int digit_origin_x(int pos) {
+	GRect bounds = layer_get_frame(window_get_root_layer(main_window));
+	int width = 4 * DIGIT_W + 4 * DIGIT_M + DOTS_W + 2 * DOTS_M;
+	int xPos = (bounds.size.w - width) / 2;
+	if(pos == 0) return xPos;
+	
+	xPos = xPos + DIGIT_W + DIGIT_M;
+	if(pos == 1) return xPos;
+	
+	xPos = xPos + DIGIT_W + 2 * DIGIT_M + DOTS_W + 2 * DOTS_M;
+	if(pos == 2) return xPos;
+	
+	xPos = xPos + DIGIT_W + DIGIT_M;
+	if(pos == 3) return xPos;
+	
+	return 0;
 }
 
-/* update procedure for drawing dots between digits */
-void dots_update_proc(Layer *l, GContext *ctx) {
-	// draw dots
-	graphics_context_set_fill_color(ctx, digit_colour());
-	graphics_fill_rect(ctx, GRect(0, 26, 2, 5), 0, GCornerNone);
-	graphics_fill_rect(ctx, GRect(0, 47, 2, 5), 0, GCornerNone);
+int dots_origin_x() {
+	return digit_origin_x(1) + DIGIT_W + DIGIT_M + DOTS_M;
 }
 
-/* helper method - return integer to represent the digit's layer reference */
+// return integer to represent the digit's layer reference
 int layer_ref_int(Layer *l) {
 	// get layer ref, used as lookup in time_buffer char
 	if(l == hours1_layer) {
@@ -98,7 +127,24 @@ int layer_ref_int(Layer *l) {
 	}
 }
 
-/* update procedure for drawing a digit */
+/*** UPDATE PROCS ***/	
+
+void background_update_proc(Layer *l, GContext *ctx) {
+	// make background black
+	graphics_context_set_fill_color(ctx, GColorBlack);
+	graphics_fill_rect(ctx, layer_get_frame(l), 0, GCornerNone);
+}
+
+void dots_update_proc(Layer *l, GContext *ctx) {
+	// draw dots between digits
+	graphics_context_set_fill_color(ctx, digit_colour());
+	GRect bounds = layer_get_frame(l);
+	int h1 = (bounds.size.h - 2 * DOTS_H - DOTS_V) / 2;
+	int h2 = bounds.size.h - h1 - DOTS_H;
+	graphics_fill_rect(ctx, GRect(0, h1, DOTS_W, DOTS_H), 0, GCornerNone);
+	graphics_fill_rect(ctx, GRect(0, h2, DOTS_W, DOTS_H), 0, GCornerNone);
+}
+
 void digits_update_proc(Layer *l, GContext *ctx) {
 	// set context fill and stroke
 	graphics_context_set_fill_color(ctx, digit_colour());
@@ -114,7 +160,6 @@ void digits_update_proc(Layer *l, GContext *ctx) {
 	drawdigit(ctx, val);
 }
 
-/* update procedure for drawing the date */
 void date_update_proc(Layer *l, GContext *ctx) {
 	// set context fill and stroke
 	graphics_context_set_fill_color(ctx, digit_colour());
@@ -129,7 +174,6 @@ void date_update_proc(Layer *l, GContext *ctx) {
 	}
 }
 
-/* update procedure for drawing bluetooth */
 void bluetooth_update_proc(Layer *l, GContext *ctx) {
 	// set context fill and stroke
 	graphics_context_set_fill_color(ctx, digit_colour());
@@ -186,31 +230,33 @@ void update_time() {
 	layer_mark_dirty(bluetooth_layer);
 }
 
-/* tick_handler, only purpose is to call update_time */
+/*** TICK HANDLER***/
+
 void tick_handler(struct tm * time_time, TimeUnits units_changed) {
 	update_time();
 }
 
+/*** WINDOW HANDLER CALLBACKS ***/	
 
-/*****************************************************/
-/************* WINDOW HANDLER CALLBACKS **************/	
-/*****************************************************/
-
-void main_window_load() {
-	// Get a layer for the window to simplify adding layers
-	Layer *window_layer = window_get_root_layer(main_window);
+static void setup_layers(Layer *window_layer) {
 	
-	// Create the layers
-	background_layer = layer_create(GRect(0, 0, 144, 168));
-	dots_layer = layer_create(GRect(71, 38, 2, 80));
-	hours1_layer = layer_create(GRect(2, 34, 31, 88));
-	hours2_layer = layer_create(GRect(36, 34, 31, 88));
-	mins1_layer = layer_create(GRect(76, 34, 31, 88));
-	mins2_layer = layer_create(GRect(111, 34, 31, 88));
-	date_layer = layer_create(GRect(40,143,64,21));
-	bluetooth_layer = layer_create(GRect(125,2,15,21));
+	GRect bounds = layer_get_frame(window_layer);
+	int w1 = bounds.size.w;
 	
-	// Set update_proc for graphics layers
+	background_layer = layer_create(bounds);
+	dots_layer = layer_create(GRect(dots_origin_x(), digit_origin_y(), DOTS_W, DIGIT_H));
+	hours1_layer = layer_create(GRect(digit_origin_x(0), digit_origin_y(), DIGIT_W, DIGIT_H));
+	hours2_layer = layer_create(GRect(digit_origin_x(1), digit_origin_y(), DIGIT_W, DIGIT_H));
+	mins1_layer = layer_create(GRect(digit_origin_x(2), digit_origin_y(), DIGIT_W, DIGIT_H));
+	mins2_layer = layer_create(GRect(digit_origin_x(3), digit_origin_y(), DIGIT_W, DIGIT_H));
+	#ifdef PBL_ROUND
+	bluetooth_layer = layer_create(GRect( (w1 - 2 * BT_WIDTH - 2)/2, BLUE_V_OFF_RD, 2 * BT_WIDTH + 2, 4 * BT_HEIGHT + 1));
+	date_layer = layer_create(GRect((w1 - DATE_W)/2, bounds.size.h - DATE_H - DATE_V_OFF_RD, DATE_W, DATE_H));
+	#else
+	bluetooth_layer = layer_create(GRect(w1 - 2 * BT_WIDTH - 2 - BLUE_H_OFF, BLUE_V_OFF_SQ, 2 * BT_WIDTH + 2, 4 * BT_HEIGHT + 1));
+	date_layer = layer_create(GRect((w1 - DATE_W)/2, bounds.size.h - DATE_H - DATE_V_OFF_SQ, DATE_W, DATE_H));
+	#endif
+	
 	layer_set_update_proc(hours1_layer, digits_update_proc);
 	layer_set_update_proc(hours2_layer, digits_update_proc);
 	layer_set_update_proc(mins1_layer, digits_update_proc);
@@ -219,8 +265,7 @@ void main_window_load() {
 	layer_set_update_proc(dots_layer, dots_update_proc);
 	layer_set_update_proc(date_layer, date_update_proc);
 	layer_set_update_proc(bluetooth_layer, bluetooth_update_proc);
-		
-	// Add all layers to the window
+	
 	layer_add_child(window_layer, background_layer);
 	layer_add_child(window_layer, dots_layer);
 	layer_add_child(window_layer, hours1_layer);
@@ -229,8 +274,21 @@ void main_window_load() {
 	layer_add_child(window_layer, mins2_layer);
 	layer_add_child(window_layer, date_layer);
 	layer_add_child(window_layer, bluetooth_layer);
+}
+
+void main_window_load() {
+	// Get a layer for the window to simplify adding layers
+	Layer *window_layer = window_get_root_layer(main_window);
 	
-	// Ensure correct time
+	// Create the layers
+	setup_layers(window_layer);
+	
+	#ifdef DEBUG
+	persist_write_bool(STORAGE_DATE_VISIBLE, true);
+	persist_write_bool(STORAGE_BLUETOOTH_VISIBLE, true);
+	bluetooth_connected = bluetooth_connection_service_peek();
+	#endif
+	
 	update_time();
 }
 
@@ -246,24 +304,17 @@ void main_window_unload() {
 	layer_destroy(bluetooth_layer);
 }
 
+/*** BLUETOOTH HANDLER ***/
 
-/*****************************************************/
-/**************** BLUETOOTH HANDLER ******************/	
-/*****************************************************/
-
-/* bluetooth handler for bluetooth subscription */
 void bt_handler(bool connected) {
 	// whatever the connected state is, pass it to bluetooth_connected and update time to reflect on screen
 	bluetooth_connected = connected;
 	update_time();
 }
 
+/*** COMMUNICATION HANDLER CALLBACKS ***/	
 
-/*****************************************************/
-/********* COMMUNICATION HANDLER CALLBACKS ***********/	
-/*****************************************************/
-
-/*inbox received callback, deal with successful receipt of message from phone */
+// inbox received callback, deal with successful receipt of message from phone
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
 	// before we do anything else, make necessary buffers
 	char date_on_off_buffer[4];
@@ -363,15 +414,12 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 	}
 }
 
-/* inbox dropped callback - logs a message that there's been an error */
+// inbox dropped callback - logs a message that there's been an error
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
 	APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped");
 }
 
-
-/*****************************************************/
-/*************** INIT, DEINIT & MAIN *****************/	
-/*****************************************************/
+/*** INIT, DEINIT & MAIN ***/	
 
 void init() {
 	// Create main window
@@ -391,7 +439,8 @@ void init() {
 	app_message_register_inbox_dropped(inbox_dropped_callback);
 	
 	// open AppMessage
-	app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
+	//app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());		// frowned upon
+	app_message_open(APP_INBOX, APP_OUTBOX);
 	
 	// check whether bluetooth display is active and if so set it up
 	if(persist_read_bool(STORAGE_BLUETOOTH_VISIBLE)) {
