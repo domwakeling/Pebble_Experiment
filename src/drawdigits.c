@@ -1,15 +1,14 @@
 #include <pebble.h>
 #include "drawdigits.h"
 
-/* Custom drawing function passing in GPathInfo; prevent repeating create/destory in each segment */
-
+// Custom drawing function passing in GPathInfo; prevent repeating create/destory in each segment
 void custom_draw_gpathinfo(GContext *ctx, GPathInfo *pathinfo) {
 	GPath *t_path = gpath_create(pathinfo);
 	gpath_draw_filled(ctx, t_path);
 	gpath_destroy(t_path);
 }
 
-/* Individual functions defining GPathInfo and passng to the custom_draw_gpathinfo */
+// Individual functions defining GPathInfo and passng to the custom_draw_gpathinfo
 
 void draw_left_1(GContext *ctx) {
 	GPathInfo TEMP = {
@@ -287,7 +286,7 @@ void draw_center_4(GContext *ctx) {
 }
 
 
-/* *** Functions to draw numbers from paths *** */
+// *** Functions to draw numbers from paths ***
 
 void draw_zero(GContext *ctx) {
 	draw_left_diag_1(ctx);
@@ -432,7 +431,7 @@ void draw_nine(GContext *ctx) {
 }
 
 
-/* *** Public function to call relevant draw function *** */
+// *** Public function to call relevant draw function ***
 
 void drawdigit(GContext *ctx, int val) {
 	switch(val) {

@@ -1,0 +1,40 @@
+{
+    "author": "Dominic Wakeling",
+    "dependencies": {},
+    "keywords": [],
+    "name": "segmented",
+    "pebble": {
+        "capabilities": [
+            "configurable"
+        ],
+        "displayName": "Segmented",
+        "enableMultiJS": true,
+        "messageKeys": [
+            "SHOW_BLUETOOTH",
+            "DIGIT_COLOUR",
+            "SHOW_DATE"
+        ],
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "images/Segmented_2318_28SQ.png",
+                    "menuIcon": true,
+                    "name": "MENU_IMAGE_28_SQ",
+                    "type": "bitmap"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt",
+            "chalk"
+        ],
+        "uuid": "23754672-b5ed-4198-b99a-a868ec8acca1",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "2.1.0"
+}
