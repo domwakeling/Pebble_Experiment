@@ -17,26 +17,26 @@ Pebble.addEventListener("showConfiguration", function() {
 	
 	if(watch_type >= 3) {
 		console.log("showing configuration for basalt");
-		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_1_9_col.html?'+encodeURIComponent(JSON.stringify(options)));
+		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_2_1_col.html?'+encodeURIComponent(JSON.stringify(options)));
 	} else {
 		console.log("showing configuration for aplite");
-		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_1_9_bw.html?'+encodeURIComponent(JSON.stringify(options)));
+		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_2_1_bw.html?'+encodeURIComponent(JSON.stringify(options)));
 	}
 });
 
 Pebble.addEventListener("webviewclosed", function(e) {
 	// make a console entry
 	console.log("configuration closed");
-
-	//Using primitive JSON validity and non-empty check
-	if (e.response.charAt(0) == "{" && e.response.slice(-1) == "}" && e.response.length > 5) {
+	console.log("event info");
+	console.log(e.response);
 		
+	try {
 		// set options based on the return data, and send to persistant storage
 		options = JSON.parse(decodeURIComponent(e.response));
 		localStorage.setItem("settings", JSON.stringify(options));
 		
 		// log the returned info
-		console.log("Options = " + JSON.stringify(options));
+		console.log("Options received = " + JSON.stringify(options));
 		
 		// we want to make a dictionary from the available information, so get the values as variables ...
 		var dateshowing;
@@ -47,8 +47,15 @@ Pebble.addEventListener("webviewclosed", function(e) {
 		}
 		console.log("dateshowing: " + dateshowing);
 		
-		var selectedcolour = options.digit_colour.toString().slice(2);
-		console.log("colour selected: " + selectedcolour);
+		var selectedcolour = "";
+		try {
+			selectedcolour = options.digit_colour.toString().slice(2);
+			console.log("colour selected: " + selectedcolour);
+		}
+		catch(err) {
+			console.log("no colour selection received, setting to white");
+			selectedcolour = "FFFFFF";
+		}
 		
 		var bluetoothshowing;
 		if( options.showbluetooth == "checked") {
@@ -60,9 +67,9 @@ Pebble.addEventListener("webviewclosed", function(e) {
 		
 		// ... then build a dictionary ...
 		var dictionary = {
-			'KEY_SHOW_DATE' : dateshowing,
-			'KEY_DIGIT_COLOUR' : selectedcolour,
-			'KEY_SHOW_BLUETOOTH' : bluetoothshowing
+			'SHOW_DATE' : dateshowing,
+			'DIGIT_COLOUR' : selectedcolour,
+			'SHOW_BLUETOOTH' : bluetoothshowing
 		};
 		
 		// ... and send it to the watch
@@ -75,9 +82,11 @@ Pebble.addEventListener("webviewclosed", function(e) {
 			}
 		);
 		
-	} else {
-		// if we failed the test, log that configuation was cancelled
-		console.log("Cancelled");
+	}	
+	// if we hit an error in the above ...
+	catch(err) {
+		// ... log that configuation was cancelled and the error that caused it
+		console.log("Cancelled due to error: " + err);
 	}
 });
 

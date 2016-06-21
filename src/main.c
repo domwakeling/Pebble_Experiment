@@ -8,9 +8,9 @@
 
 /*** KEY VALUES THROUGH DEFINES ***/	
 
-#define KEY_SHOW_DATE 0															// key values for communication with settings screen via Javascript
-#define KEY_SHOW_BLUETOOTH 1
-#define KEY_DIGIT_COLOUR 2
+// #define KEY_SHOW_DATE 0															// key values for communication with settings screen via Javascript
+// #define KEY_SHOW_BLUETOOTH 1
+// #define KEY_DIGIT_COLOUR 2
 
 /*** KEY VALUES THROUGH DECLARATIONS ***/
 
@@ -325,93 +325,69 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 		colour_hex_buffer_pointer = colour_hex_buffer;
 	#endif
 	
-	// read first item from the dictionary
-	Tuple *t = dict_read_first(iterator);
-	
-	// now there's more than one key, make sure we haven't passed the last one ...
-	while(t != NULL) {
-	
-		// ... then work out which key we're reading
-		
-		switch(t->key) {
-		
-			// if it's the date-showing item
-			case KEY_SHOW_DATE:
-				
-				// get the value ("on" or "off") and log it				
-				snprintf(date_on_off_buffer, sizeof(date_on_off_buffer), "%s", t->value->cstring );
-				APP_LOG(APP_LOG_LEVEL_INFO, "Date tempchar received as '%s'", date_on_off_buffer);
+	Tuple *tempDate = dict_find(iterator, MESSAGE_KEY_SHOW_DATE);
+	// 'if' wrapper to ensure we've got a valid tuple
+	if (tempDate) {
+		// get the value ("on" or "off") and log it				
+		snprintf(date_on_off_buffer, sizeof(date_on_off_buffer), "%s", tempDate->value->cstring );
+		APP_LOG(APP_LOG_LEVEL_INFO, "Date tempchar received as '%s'", date_on_off_buffer);
 
-				// change date-visible as appropriate
-				if (strcmp(date_on_off_buffer,"on") == 0) {
-					// store date visible true and refresh display
-					APP_LOG(APP_LOG_LEVEL_INFO, "Received date 'on', writing to storage");
-					persist_write_bool(STORAGE_DATE_VISIBLE, true);
-					update_time();
-				} else if (strcmp(date_on_off_buffer, "off") == 0){
-					// store data visible false and refresh display
-					APP_LOG(APP_LOG_LEVEL_INFO, "Received date 'off', writing to storage");
-					persist_write_bool(STORAGE_DATE_VISIBLE, false);
-					update_time();
-				} else {
-					APP_LOG(APP_LOG_LEVEL_ERROR, "Error interpreting config - received value %s for dateshowing", date_on_off_buffer);
-				}
-			
-				break;
-			
-			// if it's the bluetooth-showing item
-			case KEY_SHOW_BLUETOOTH:
-			
-				// get the value ("on" or "off") and log it				
-				snprintf(bluetooth_on_off_buffer, sizeof(bluetooth_on_off_buffer), "%s", t->value->cstring );
-				APP_LOG(APP_LOG_LEVEL_INFO, "Bluetooth tempchar received as '%s'", bluetooth_on_off_buffer);
+		// change date-visible as appropriate
+		if (strcmp(date_on_off_buffer,"on") == 0) {
+			// store date visible true and refresh display
+			APP_LOG(APP_LOG_LEVEL_INFO, "Received date 'on', writing to storage");
+			persist_write_bool(STORAGE_DATE_VISIBLE, true);
+			update_time();
+		} else if (strcmp(date_on_off_buffer, "off") == 0){
+			// store data visible false and refresh display
+			APP_LOG(APP_LOG_LEVEL_INFO, "Received date 'off', writing to storage");
+			persist_write_bool(STORAGE_DATE_VISIBLE, false);
+			update_time();
+		} else {
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Error interpreting config - received value %s for dateshowing", date_on_off_buffer);
+		}
+	}
+	
+	Tuple *tempBlue = dict_find(iterator, MESSAGE_KEY_SHOW_BLUETOOTH);
+	// 'if' wrapper to ensure we've got a valid tuple
+	if (tempBlue) {
+		// get the value ("on" or "off") and log it				
+		snprintf(bluetooth_on_off_buffer, sizeof(bluetooth_on_off_buffer), "%s", tempBlue->value->cstring );
+		APP_LOG(APP_LOG_LEVEL_INFO, "Bluetooth tempchar received as '%s'", bluetooth_on_off_buffer);
 
-				// change bluetooth-visible as appropriate
-				if (strcmp(bluetooth_on_off_buffer,"on") == 0) {
-					// store bluetooth visible true
-					APP_LOG(APP_LOG_LEVEL_INFO, "Received bluetooth 'on', writing to storage");
-					persist_write_bool(STORAGE_BLUETOOTH_VISIBLE, true);
-					// subscribe to the service, get current status
-					bluetooth_connection_service_subscribe(bt_handler);
-					APP_LOG(APP_LOG_LEVEL_INFO, "Subscribed to blueooth connection");
-					bluetooth_connected = bluetooth_connection_service_peek();
-					// update the display
-					update_time();
-				} else if (strcmp(bluetooth_on_off_buffer, "off") == 0){
-					// store bluetooth visible false
-					APP_LOG(APP_LOG_LEVEL_INFO, "Received bluetooth 'off', writing to storage");
-					persist_write_bool(STORAGE_BLUETOOTH_VISIBLE, false);
-					// unsubscribe
-					bluetooth_connection_service_unsubscribe();
-					update_time();
-				} else {
-					APP_LOG(APP_LOG_LEVEL_ERROR, "Error interpreting config - received value %s for bluetoothshowing", bluetooth_on_off_buffer);
-				}
-			
-				break;
-			
-			// if it's the colour-picking item
-			case KEY_DIGIT_COLOUR:
-			
-				// only do something if we're using a colour pebble
-				#ifdef PBL_COLOR
-					snprintf(colour_hex_buffer, sizeof(colour_hex_buffer), "%s", t->value->cstring );
+		// change bluetooth-visible as appropriate
+		if (strcmp(bluetooth_on_off_buffer,"on") == 0) {
+			// store bluetooth visible true
+			APP_LOG(APP_LOG_LEVEL_INFO, "Received bluetooth 'on', writing to storage");
+			persist_write_bool(STORAGE_BLUETOOTH_VISIBLE, true);
+			// subscribe to the service, get current status
+			bluetooth_connection_service_subscribe(bt_handler);
+			APP_LOG(APP_LOG_LEVEL_INFO, "Subscribed to blueooth connection");
+			bluetooth_connected = bluetooth_connection_service_peek();
+			// update the display
+			update_time();
+		} else if (strcmp(bluetooth_on_off_buffer, "off") == 0){
+			// store bluetooth visible false
+			APP_LOG(APP_LOG_LEVEL_INFO, "Received bluetooth 'off', writing to storage");
+			persist_write_bool(STORAGE_BLUETOOTH_VISIBLE, false);
+			// unsubscribe
+			bluetooth_connection_service_unsubscribe();
+			update_time();
+		} else {
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Error interpreting config - received value %s for bluetoothshowing", bluetooth_on_off_buffer);
+		}
+	}
+	
+	#ifdef PBL_COLOR
+	Tuple *tempColour = dict_find(iterator, MESSAGE_KEY_DIGIT_COLOUR);
+	// 'if' wrapper to ensure we've got a valid tuple
+	if (tempColour) {
+					snprintf(colour_hex_buffer, sizeof(colour_hex_buffer), "%s", tempColour->value->cstring );
 					APP_LOG(APP_LOG_LEVEL_INFO, "Received hex code %s, writing to storage", colour_hex_buffer);
 					write_colour_to_persist(colour_hex_buffer_pointer, STORAGE_DIGIT_COLOUR_RED, STORAGE_DIGIT_COLOUR_GREEN, STORAGE_DIGIT_COLOUR_BLUE);
 					update_time();
-				#endif
-			
-				break;
-			
-			// if we didn't recognise the key, log it
-			default:
-				APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognised!", (int)t->key);
-				break;
-		} 
-		
-		// Look for next item
-    t = dict_read_next(iterator);
 	}
+	#endif
 }
 
 // inbox dropped callback - logs a message that there's been an error
