@@ -10,18 +10,26 @@ Pebble.addEventListener("ready", function() {
 Pebble.addEventListener("showConfiguration", function() {
 	// on call, make sure options represents latest persistant data
 	options = JSON.parse(localStorage.getItem("settings"));
+	if(options) { 
+		options.watchType = getWatchVersion();
+	} else { 
+		options = {'watchType' : getWatchVersion()};
+	}
 	console.log("Options being sent= " + JSON.stringify(options));
 	
 	// get the watch type, make a console entry and open the website
 	var watch_type = getWatchVersion();
 	
-	if(watch_type >= 3) {
+	console.log("showing configuration for watchtype" + watch_type);
+	Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_2_1_comb.html?'+encodeURIComponent(JSON.stringify(options)));	
+	
+	/*if(watch_type >= 3) {
 		console.log("showing configuration for basalt");
 		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_2_1_col.html?'+encodeURIComponent(JSON.stringify(options)));
 	} else {
 		console.log("showing configuration for aplite");
 		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_2_1_bw.html?'+encodeURIComponent(JSON.stringify(options)));
-	}
+	}*/
 });
 
 Pebble.addEventListener("webviewclosed", function(e) {
@@ -47,14 +55,13 @@ Pebble.addEventListener("webviewclosed", function(e) {
 		}
 		console.log("dateshowing: " + dateshowing);
 		
-		var selectedcolour = "";
+		var selectedcolour = "FFFFFF"; // will default to white; not used in Aplite, but sent to avoid addl code in main.c
 		try {
 			selectedcolour = options.digit_colour.toString().slice(2);
 			console.log("colour selected: " + selectedcolour);
 		}
 		catch(err) {
 			console.log("no colour selection received, setting to white");
-			selectedcolour = "FFFFFF";
 		}
 		
 		var bluetoothshowing;
