@@ -23,13 +23,6 @@ Pebble.addEventListener("showConfiguration", function() {
 	console.log("showing configuration for watchtype" + watch_type);
 	Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_2_1_comb.html?'+encodeURIComponent(JSON.stringify(options)));	
 	
-	/*if(watch_type >= 3) {
-		console.log("showing configuration for basalt");
-		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_2_1_col.html?'+encodeURIComponent(JSON.stringify(options)));
-	} else {
-		console.log("showing configuration for aplite");
-		Pebble.openURL('http://www.domwakeling.com/pebble/segmented/segmented_config_2_1_bw.html?'+encodeURIComponent(JSON.stringify(options)));
-	}*/
 });
 
 Pebble.addEventListener("webviewclosed", function(e) {
@@ -55,6 +48,17 @@ Pebble.addEventListener("webviewclosed", function(e) {
 		}
 		console.log("dateshowing: " + dateshowing);
 		
+		var healthshowing = "off";
+		try {
+			if( options.healthvisible == "checked") {
+				healthshowing = "on";
+			}
+			console.log("dateshowing: " + dateshowing);
+		}
+		catch(err) {
+			console.log("not known if health is showing or not, default to off");
+		}
+		
 		var selectedcolour = "FFFFFF"; // will default to white; not used in Aplite, but sent to avoid addl code in main.c
 		try {
 			selectedcolour = options.digit_colour.toString().slice(2);
@@ -76,7 +80,8 @@ Pebble.addEventListener("webviewclosed", function(e) {
 		var dictionary = {
 			'SHOW_DATE' : dateshowing,
 			'DIGIT_COLOUR' : selectedcolour,
-			'SHOW_BLUETOOTH' : bluetoothshowing
+			'SHOW_BLUETOOTH' : bluetoothshowing,
+			'SHOW_STEPS' : healthshowing
 		};
 		
 		// ... and send it to the watch
@@ -99,12 +104,13 @@ Pebble.addEventListener("webviewclosed", function(e) {
 
 function getWatchVersion() {
 	// 1 = Pebble OG
+	// 1 = Pebble Aplite Emulator
 	// 2 = Pebble Steel
 	// 3 = Pebble Time
-	// 3 = Pebble Basalt Emulator (currently Pebble Time)
+	// 3 = Pebble Basalt Emulator
 	// 4 = Pebble Time Steel
 	// 5 = Pebble Time Round
-	// 5 = Pebble Time Emulator
+	// 5 = Pebble Chalk Emulator
 	
 	var watch_version = 1;
  
