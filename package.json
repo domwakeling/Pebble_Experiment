@@ -5,14 +5,16 @@
     "name": "segmented",
     "pebble": {
         "capabilities": [
-            "configurable"
+            "configurable",
+            "health"
         ],
         "displayName": "Segmented",
         "enableMultiJS": true,
         "messageKeys": [
             "SHOW_BLUETOOTH",
             "DIGIT_COLOUR",
-            "SHOW_DATE"
+            "SHOW_DATE",
+            "SHOW_STEPS"
         ],
         "projectType": "native",
         "resources": {

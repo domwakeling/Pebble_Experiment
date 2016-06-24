@@ -1,16 +1,10 @@
 #include <pebble.h>
 #include "drawdigits.h"
-#include "drawdate.h"
+#include "drawdatesteps.h"
 #include "colourconversion.h"
 
 /*** DEBUG MODE SWITCH ***/
 //#define DEBUG
-
-/*** KEY VALUES THROUGH DEFINES ***/	
-
-// #define KEY_SHOW_DATE 0															// key values for communication with settings screen via Javascript
-// #define KEY_SHOW_BLUETOOTH 1
-// #define KEY_DIGIT_COLOUR 2
 
 /*** KEY VALUES THROUGH DECLARATIONS ***/
 
@@ -19,6 +13,7 @@ const uint32_t STORAGE_BLUETOOTH_VISIBLE = 2;
 const uint32_t STORAGE_DIGIT_COLOUR_RED = 3;
 const uint32_t STORAGE_DIGIT_COLOUR_BLUE = 4;
 const uint32_t STORAGE_DIGIT_COLOUR_GREEN = 5;
+const uint32_t STORAGE_HEALTH_VISIBLE = 6;
 
 /*** CONSTANTS THROUGH DEFINES - SIZE OF APP_MESSAGE ***/	
 #define APP_OUTBOX 64
@@ -40,7 +35,8 @@ const uint32_t STORAGE_DIGIT_COLOUR_GREEN = 5;
 #define BT_WIDTH 4																	// height of bluetooth triangles
 #define BLUE_V_OFF_RD 5															// offset of bluetooth from top
 #define BLUE_V_OFF_SQ 2
-#define BLUE_H_OFF 4																// offset of bluetooth from edge, square
+#define BLUE_H_OFF_SQ 4															// offset of bluetooth from edge, square
+#define BLUE_H_OFF_RD 20														// offset of bluetooth from edge (of larger square), on round screen
 
 /*** CONSTANTS THROUGH DEFINES - DATE ***/	
 
@@ -48,6 +44,15 @@ const uint32_t STORAGE_DIGIT_COLOUR_GREEN = 5;
 #define DATE_H 21
 #define DATE_V_OFF_RD 10
 #define DATE_V_OFF_SQ 5
+
+/*** CONSTANTS THROUGH DEFINES - HEALTH ***/	
+
+#define HEALTH_W 80
+#define HEALTH_H 21
+#define HEALTH_V_OFF_RD 14
+#define HEALTH_V_OFF_SQ 5
+#define HEALTH_H_OFF 8
+#define STEP_LENGTH 7
 
 /*** CONSTANTS THROUGH DECLARATIONS ***/
 
@@ -58,11 +63,12 @@ const int DATE_LENGTH = 7;													// maximum length of date string, includi
 bool bluetooth_connected = false;
 static char time_buffer[] = "1234";
 static char date_buffer[] = "30 SEP";
+char steps_buffer[STEP_LENGTH] = "";									
 
 static Window *main_window;
 static Layer *background_layer, *dots_layer;
 static Layer *hours1_layer, *hours2_layer, *mins1_layer, *mins2_layer;
-static Layer *date_layer;
+static Layer *date_layer, *steps_layer;
 static Layer *bluetooth_layer;
 
 /*** HELPER FUNCTIONS ***/
@@ -174,6 +180,41 @@ void date_update_proc(Layer *l, GContext *ctx) {
 	}
 }
 
+void steps_update_proc(Layer *l, GContext *ctx) {
+	// set context fill and stroke
+	graphics_context_set_fill_color(ctx, digit_colour());
+	graphics_context_set_stroke_color(ctx, digit_colour());
+	
+	bool drawing_steps = persist_read_bool(STORAGE_HEALTH_VISIBLE);
+	
+	if(drawing_steps) {
+		
+		// setup to get time
+		HealthMetric metric = HealthMetricStepCount;
+		time_t start = time_start_of_today();
+		time_t end = time(NULL);
+
+		// Check the metric has data available for today
+		HealthServiceAccessibilityMask mask = health_service_metric_accessible(metric, start, end);
+
+		if(mask & HealthServiceAccessibilityMaskAvailable) {
+			// Data is available!
+			int steps =	(int)health_service_sum_today(metric);
+			if(steps > 999999) {
+				strcpy(steps_buffer, "999999");
+			} else {
+				snprintf(steps_buffer, sizeof(steps_buffer), "%d", steps);
+			}
+		}
+		
+		if( strlen(steps_buffer) > 0) {
+			drawsteps(l, ctx, steps_buffer, PBL_IF_RECT_ELSE(false,true));
+		} else {
+			drawsteps(l, ctx, "0", PBL_IF_RECT_ELSE(false,true));
+		}
+	}
+}
+
 void bluetooth_update_proc(Layer *l, GContext *ctx) {
 	// set context fill and stroke
 	graphics_context_set_fill_color(ctx, digit_colour());
@@ -252,9 +293,11 @@ static void setup_layers(Layer *window_layer) {
 	#ifdef PBL_ROUND
 	bluetooth_layer = layer_create(GRect( (w1 - 2 * BT_WIDTH - 2)/2, BLUE_V_OFF_RD, 2 * BT_WIDTH + 2, 4 * BT_HEIGHT + 1));
 	date_layer = layer_create(GRect((w1 - DATE_W)/2, bounds.size.h - DATE_H - DATE_V_OFF_RD, DATE_W, DATE_H));
+	steps_layer = layer_create(GRect((w1 - HEALTH_W)/2, HEALTH_V_OFF_RD, HEALTH_W, HEALTH_H));
 	#else
-	bluetooth_layer = layer_create(GRect(w1 - 2 * BT_WIDTH - 2 - BLUE_H_OFF, BLUE_V_OFF_SQ, 2 * BT_WIDTH + 2, 4 * BT_HEIGHT + 1));
+	bluetooth_layer = layer_create(GRect(w1 - 2 * BT_WIDTH - 2 - BLUE_H_OFF_SQ, BLUE_V_OFF_SQ, 2 * BT_WIDTH + 2, 4 * BT_HEIGHT + 1));
 	date_layer = layer_create(GRect((w1 - DATE_W)/2, bounds.size.h - DATE_H - DATE_V_OFF_SQ, DATE_W, DATE_H));
+	steps_layer = layer_create(GRect(HEALTH_H_OFF, HEALTH_V_OFF_SQ, HEALTH_W, HEALTH_H));
 	#endif
 	
 	layer_set_update_proc(hours1_layer, digits_update_proc);
@@ -264,6 +307,7 @@ static void setup_layers(Layer *window_layer) {
 	layer_set_update_proc(background_layer, background_update_proc);
 	layer_set_update_proc(dots_layer, dots_update_proc);
 	layer_set_update_proc(date_layer, date_update_proc);
+	layer_set_update_proc(steps_layer, steps_update_proc);
 	layer_set_update_proc(bluetooth_layer, bluetooth_update_proc);
 	
 	layer_add_child(window_layer, background_layer);
@@ -273,6 +317,7 @@ static void setup_layers(Layer *window_layer) {
 	layer_add_child(window_layer, mins1_layer);
 	layer_add_child(window_layer, mins2_layer);
 	layer_add_child(window_layer, date_layer);
+	layer_add_child(window_layer, steps_layer);
 	layer_add_child(window_layer, bluetooth_layer);
 }
 
@@ -301,6 +346,7 @@ void main_window_unload() {
 	layer_destroy(background_layer);
 	layer_destroy(dots_layer);
 	layer_destroy(date_layer);
+	layer_destroy(steps_layer);
 	layer_destroy(bluetooth_layer);
 }
 
@@ -319,6 +365,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 	// before we do anything else, make necessary buffers
 	char date_on_off_buffer[4];
 	char bluetooth_on_off_buffer[4];
+	char health_on_off_buffer[4];
 	#ifdef PBL_COLOR
 		char colour_hex_buffer[8];
 		char *colour_hex_buffer_pointer;
@@ -388,6 +435,41 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 					update_time();
 	}
 	#endif
+	
+	#ifdef PBL_HEALTH
+	Tuple *tempHealth = dict_find(iterator, MESSAGE_KEY_SHOW_STEPS);
+	if (tempHealth) {
+		// get the value ("on" or "off") and log it				
+		snprintf(health_on_off_buffer, sizeof(health_on_off_buffer), "%s", tempHealth->value->cstring );
+		APP_LOG(APP_LOG_LEVEL_INFO, "Health tempchar received as '%s'", health_on_off_buffer);
+		
+		// change health-visible as appropriate
+		if (strcmp(health_on_off_buffer,"on") == 0) {
+			// store health visible true
+			APP_LOG(APP_LOG_LEVEL_INFO, "Received health 'on', writing to storage");
+			persist_write_bool(STORAGE_HEALTH_VISIBLE, true);
+			// subscribe to the service, get current status
+			//bluetooth_connection_service_subscribe(bt_handler);
+			//APP_LOG(APP_LOG_LEVEL_INFO, "Subscribed to blueooth connection");
+			//bluetooth_connected = bluetooth_connection_service_peek();
+			// update the display
+			update_time();
+		} else if (strcmp(health_on_off_buffer, "off") == 0){
+			// store health visible false
+			APP_LOG(APP_LOG_LEVEL_INFO, "Received health 'off', writing to storage");
+			persist_write_bool(STORAGE_HEALTH_VISIBLE, false);
+			// unsubscribe
+			//bluetooth_connection_service_unsubscribe();
+			update_time();
+		} else {
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Error interpreting config - received value %s for healthshowing", health_on_off_buffer);
+		}
+		
+	} else {
+		APP_LOG(APP_LOG_LEVEL_ERROR, "No value received for MESSAGE_KEY_SHOW_STEPS");
+	}
+	#endif
+	
 }
 
 // inbox dropped callback - logs a message that there's been an error
